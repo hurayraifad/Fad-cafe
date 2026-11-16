@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAD CAFE | 3D Artisan Coffee Experience</title>
+  <meta name="description" content="Experience Dhaka's premier 3D interactive coffee and artisanal chai lounge at FAD CAFE, Signboard.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Three.js 3D Library via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <style>
+    :root {
+      --bg-body: #0a0807;
+      --bg-surface: #14100d;
+      --bg-card: rgba(26, 21, 18, 0.72);
+      --border-subtle: rgba(212, 175, 122, 0.16);
+      --border-gold: rgba(212, 175, 122, 0.45);
+      --gold: #d4af7a;
+      --gold-light: #edd3a4;
+      --gold-glow: rgba(212, 175, 122, 0.3);
+      --text-main: #f5f0ea;
+      --text-muted: #a3998e;
+      --white: #ffffff;
+      --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      overflow-x: hidden;
+      line-height: 1.65;
+    }
+
+    /* Fixed Glass Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(10, 8, 7, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 18px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 9px;
+      letter-spacing: 3.5px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-top: 4px;
+      opacity: 0.85;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--gold-light);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border-gold);
+      color: var(--gold-light);
+      padding: 10px 22px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+
+    .nav-btn:hover {
+      background: var(--gold);
+      color: var(--bg-body);
+      box-shadow: 0 0 25px var(--gold-glow);
+    }
+
+    .menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1001;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--gold);
+      transition: var(--transition);
+    }
+
+    /* 3D HERO SECTION */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      align-items: center;
+      position: relative;
+      padding: 0 8%;
+      overflow: hidden;
+      background: radial-gradient(circle at 70% 50%, rgba(212, 175, 122, 0.12) 0%, transparent 60%);
+    }
+
+    .hero-container {
+      z-index: 10;
+      max-width: 620px;
+      padding: 40px 0;
+    }
+
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(212, 175, 122, 0.08);
+      border: 1px solid var(--border-gold);
+      padding: 7px 18px;
+      border-radius: 50px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 5.5vw, 74px);
+      line-height: 1.12;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--gold);
+      font-weight: 400;
+      text-shadow: 0 0 35px rgba(212, 175, 122, 0.35);
+    }
+
+    .hero p {
+      font-size: 16.5px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 35px;
+      max-width: 500px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #0a0807;
+      padding: 15px 34px;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: var(--transition);
+      box-shadow: 0 6px 25px rgba(212, 175, 122, 0.3);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-light);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 32px rgba(212, 175, 122, 0.5);
+    }
+
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--white);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 15px 30px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 50px;
+      transition: var(--transition);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212, 175, 122, 0.08);
+      transform: translateY(-2px);
+    }
+
+    /* 3D Canvas Container */
+    #canvas3d-container {
+      width: 100%;
+      height: 100%;
+      min-height: 520px;
+      position: relative;
+      cursor: grab;
+    }
+
+    #canvas3d-container:active {
+      cursor: grabbing;
+    }
+
+    .interactive-hint {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      background: rgba(14, 11, 9, 0.85);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+      opacity: 0.85;
+      white-space: nowrap;
+    }
+
+    /* Highlights */
+    .highlights {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-surface);
+    }
+
+    .highlight-box {
+      padding: 34px 24px;
+      text-align: center;
+      border-right: 1px solid var(--border-subtle);
+      transition: var(--transition);
+    }
+
+    .highlight-box:hover {
+      background: rgba(212, 175, 122, 0.03);
+    }
+
+    .highlight-box:last-child {
+      border-right: none;
+    }
+
+    .highlight-box .icon {
+      font-size: 26px;
+      margin-bottom: 8px;
+    }
+
+    .highlight-box h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .highlight-box p {
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* Section Global */
+    section {
+      padding: 110px 8%;
+      scroll-margin-top: 80px;
+    }
+
+    .section-head {
+      text-align: center;
+      max-width: 640px;
+      margin: 0 auto 60px;
+    }
+
+    .section-head span {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .section-head h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 4.2vw, 48px);
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    /* About Section */
+    .about-wrap {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 65px;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+
+    .about-visual img {
+      width: 100%;
+      height: 480px;
+      object-fit: cover;
+      border-radius: 12px;
+      filter: contrast(105%) brightness(95%);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      transition: transform 0.5s ease;
+    }
+
+    .about-badge-card {
+      position: absolute;
+      bottom: -25px;
+      right: -25px;
+      background: rgba(14, 11, 9, 0.94);
+      border: 1px solid var(--border-gold);
+      backdrop-filter: blur(14px);
+      padding: 24px 30px;
+      border-radius: 10px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+    }
+
+    .about-badge-card .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 38px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .about-badge-card .lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 5px;
+    }
+
+    .about-content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      margin-bottom: 22px;
+      line-height: 1.25;
+    }
+
+    .about-content p {
+      color: var(--text-muted);
+      font-size: 15.5px;
+      line-height: 1.85;
+      margin-bottom: 22px;
+    }
+
+    /* 3D TILT MENU ITEMS */
+    .menu-section {
+      background: #0f0d0b;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .filter-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 50px;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 10px 24px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--gold);
+      color: var(--bg-body);
+      border-color: var(--gold);
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 24px;
+      perspective: 1200px; /* 3D Depth */
+    }
+
+    /* 3D Card Styling */
+    .menu-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transform-style: preserve-3d;
+      transition: transform 0.2s ease-out, border-color 0.3s ease, box-shadow 0.3s ease;
+      will-change: transform;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .menu-item:hover {
+      border-color: var(--border-gold);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(212, 175, 122, 0.15);
+    }
+
+    .item-thumb {
+      width: 74px;
+      height: 74px;
+      border-radius: 12px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid rgba(212, 175, 122, 0.28);
+      transform: translateZ(25px); /* 3D POP */
+      transition: transform 0.3s ease;
+    }
+
+    .menu-item:hover .item-thumb {
+      transform: translateZ(35px) scale(1.05);
+      border-color: var(--gold);
+    }
+
+    .menu-item-info {
+      flex: 1;
+      min-width: 0;
+      transform: translateZ(20px); /* 3D Depth */
+    }
+
+    .menu-item-info h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 17.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .menu-item-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .menu-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--gold-light);
+      padding-left: 10px;
+      white-space: nowrap;
+      transform: translateZ(30px);
+    }
+
+    /* Signature Highlight */
+    .signature-banner {
+      background: linear-gradient(rgba(10, 8, 7, 0.88), rgba(10, 8, 7, 0.88)),
+                  url('https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1600') center/cover fixed no-repeat;
+      text-align: center;
+      padding: 120px 8%;
+      position: relative;
+    }
+
+    .signature-banner h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(34px, 4.5vw, 56px);
+      margin: 15px 0 20px;
+    }
+
+    .signature-banner p {
+      max-width: 600px;
+      margin: 0 auto 35px;
+      color: #cfc5b6;
+      font-size: 16.5px;
+      line-height: 1.8;
+    }
+
+    /* Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      perspective: 1000px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      border-radius: 8px;
+      height: 240px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: var(--transition);
+    }
+
+    .gallery-item.span-2 {
+      grid-column: span 2;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.08);
+    }
+
+    /* Visit / Location */
+    .visit-section {
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .visit-card-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .visit-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 38px 30px;
+      text-align: center;
+      transition: var(--transition);
+      transform-style: preserve-3d;
+    }
+
+    .visit-card:hover {
+      border-color: var(--border-gold);
+      transform: translateY(-5px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .visit-card .icon {
+      font-size: 34px;
+      margin-bottom: 15px;
+      display: inline-block;
+    }
+
+    .visit-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      margin-bottom: 10px;
+      color: var(--gold-light);
+    }
+
+    .visit-card p {
+      color: var(--text-muted);
+      font-size: 14.5px;
+      line-height: 1.7;
+    }
+
+    /* Footer */
+    footer {
+      background: #060504;
+      padding: 60px 8% 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      text-align: center;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .footer-text {
+      color: var(--text-muted);
+      font-size: 14px;
+      margin-bottom: 25px;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 35px;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: 1px;
+      transition: var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+    }
+
+    .copyright {
+      font-size: 12px;
+      color: #61574e;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 25px;
+    }
+
+    /* WhatsApp Button */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #25d366;
+      color: #fff;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      text-decoration: none;
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.35);
+      z-index: 999;
+      transition: var(--transition);
+    }
+
+    .whatsapp-float:hover {
+      transform: scale(1.1) translateY(-3px);
+      box-shadow: 0 12px 30px rgba(37, 211, 102, 0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 960px) {
+      .hero {
+        grid-template-columns: 1fr;
+        padding-top: 40px;
+      }
+      #canvas3d-container {
+        min-height: 400px;
+      }
+      .about-wrap {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .highlights {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      header {
+        padding: 16px 6%;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 78%;
+        height: 100vh;
+        background: #14100d;
+        flex-direction: column;
+        justify-content: center;
+        gap: 28px;
+        transition: right 0.4s ease;
+        box-shadow: -10px 0 30px rgba(0, 0, 0, 0.7);
+        border-left: 1px solid var(--border-gold);
+      }
+      nav.open {
+        right: 0;
+      }
+      .highlights {
+        grid-template-columns: 1fr;
+      }
+      .gallery-item, .gallery-item.span-2 {
+        grid-column: span 2;
+        height: 190px;
+      }
+      section {
+        padding: 75px 6%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <a href="#home" class="brand">
+      <span class="brand-name">FAD CAFE</span>
+      <span class="brand-sub">3D Lounge · Dhaka</span>
+    </a>
+
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav id="navMenu">
+      <a href="#home" class="nav-link">Home</a>
+      <a href="#about" class="nav-link">Story</a>
+      <a href="#menu" class="nav-link">3D Menu</a>
+      <a href="#gallery" class="nav-link">Moments</a>
+      <a href="#visit" class="nav-link">Location</a>
+      <a href="https://wa.me/8801700000000?text=Hello%20FAD%20Cafe,%20I%20would%20like%20to%20order" target="_blank" class="nav-btn">Order Online</a>
+    </nav>
+  </header>
+
+  <!-- 3D HERO SECTION -->
+  <section class="hero" id="home">
+    <div class="hero-container">
+      <div class="tag-badge">
+        <span>✨</span> 3D Interactive Coffee Lounge
+      </div>
+      <h1>A Little Pause.<br><em>A Lot of Comfort.</em></h1>
+      <p>Step into an elevated sensory journey. Savor hand-roasted single origin espressos, artisan spiced Malai chai, and freshly prepared bites right here at Signboard, Dhaka.</p>
+      <div class="hero-actions">
+        <a href="#menu" class="btn-gold">Explore Menu</a>
+        <a href="#visit" class="btn-outline">Find Location</a>
+      </div>
+    </div>
+
+    <!-- 3D WebGL Canvas Container -->
+    <div id="canvas3d-container">
+      <div class="interactive-hint">✦ Drag to Rotate Cup 3D ✦</div>
+    </div>
+  </section>
+
+  <!-- Highlights -->
+  <div class="highlights">
+    <div class="highlight-box">
+      <div class="icon">☕</div>
+      <h4>Single-Origin Beans</h4>
+      <p>Precision roasted daily</p>
+    </div>
+    <div class="highlight-box">
+      <div class="icon">🫖</div>
+      <h4>Signature Chai</h4>
+      <p>Rich cream slow-infused tea</p>
+    </div>
+    <div class="highlight-box">
+      <div class="icon">🧊</div>
+      <h4>Chilled Coolers</h4>
+      <p>Artisan mint & thick milkshakes</p>
+    </div>
+    <div class="highlight-box">
+      <div class="icon">📍</div>
+      <h4>Signboard, Dhaka</h4>
+      <p>Cozy space for friends & work</p>
+    </div>
+  </div>
+
+  <!-- Story Section -->
+  <section class="about" id="about">
+    <div class="about-wrap">
+      <div class="about-visual">
+        <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1000" alt="FAD Cafe interior">
+        <div class="about-badge-card">
+          <div class="num">100%</div>
+          <div class="lbl">Pure Ingredients</div>
+        </div>
+      </div>
+      <div class="about-content">
+        <div class="section-head" style="text-align: left; margin-bottom: 24px;">
+          <span>Craftsmanship</span>
+          <h2>Crafted With Care & Deep Passion</h2>
+        </div>
+        <p>At FAD CAFE, we believe coffee and tea aren’t just beverages—they are small celebrations of quiet moments and conversations with loved ones.</p>
+        <p>Located at Signboard, Dhaka, we blend contemporary cafe culture with the timeless flavors of authentic Bengali adda. From rich cappuccinos to special tamarind tea and hot pora ruti, each recipe is prepared to deliver comfort.</p>
+        <a href="#menu" class="btn-gold" style="display:inline-block; margin-top: 10px;">Taste The Difference</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Interactive 3D Menu with Images -->
+  <section class="menu-section" id="menu">
+    <div class="section-head">
+      <span>Curated Flavours</span>
+      <h2>Interactive 3D Menu</h2>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" onclick="filterMenu('all')">All Items</button>
+      <button class="filter-btn" onclick="filterMenu('coffee')">Coffee</button>
+      <button class="filter-btn" onclick="filterMenu('chai')">Signature Chai</button>
+      <button class="filter-btn" onclick="filterMenu('drinks')">Cold Shakes</button>
+      <button class="filter-btn" onclick="filterMenu('snacks')">Snacks & Bites</button>
+    </div>
+
+    <div class="menu-grid" id="menuGrid">
+      
+      <!-- Coffee -->
+      <div class="menu-item tilt-card" data-category="coffee">
+        <img src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=300" alt="Hot Coffee" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Hot Coffee</h4>
+          <p>Fresh brewed rich roast</p>
+        </div>
+        <div class="menu-price">৳40</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="coffee">
+        <img src="https://images.unsplash.com/photo-1517701604599-bb29b565090c?w=300" alt="Black Coffee" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Black Coffee</h4>
+          <p>Pure strong espresso pour</p>
+        </div>
+        <div class="menu-price">৳40</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="coffee">
+        <img src="https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=300" alt="Cappuccino" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Cappuccino</h4>
+          <p>Silky frothed steamed milk</p>
+        </div>
+        <div class="menu-price">৳60</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="coffee">
+        <img src="https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=300" alt="Cold Coffee" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Cold Coffee</h4>
+          <p>Chilled, blended & creamy</p>
+        </div>
+        <div class="menu-price">৳60</div>
+      </div>
+
+      <!-- Chai -->
+      <div class="menu-item tilt-card" data-category="chai">
+        <img src="https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=300" alt="Malai Chai" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Malai Chai</h4>
+          <p>Creamy traditional slow-brewed tea</p>
+        </div>
+        <div class="menu-price">৳30</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="chai">
+        <img src="https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?w=300" alt="Shahi Rong Cha" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Shahi Rong Cha</h4>
+          <p>Infused with aromatic spices</p>
+        </div>
+        <div class="menu-price">৳25</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="chai">
+        <img src="https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=300" alt="Tamarind Tea" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Tamarind Tea</h4>
+          <p>Tangy, refreshing & revitalizing</p>
+        </div>
+        <div class="menu-price">৳30</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="chai">
+        <img src="https://images.unsplash.com/photo-1561336313-0bd5e0b27ec8?w=300" alt="Fad Special Chai" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Fad Special Chai</h4>
+          <p>Our secret kitchen signature blend</p>
+        </div>
+        <div class="menu-price">৳40</div>
+      </div>
+
+      <!-- Cold Drinks -->
+      <div class="menu-item tilt-card" data-category="drinks">
+        <img src="https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=300" alt="Chocolate Milk Shake" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Chocolate Milk Shake</h4>
+          <p>Thick rich cocoa chocolate shake</p>
+        </div>
+        <div class="menu-price">৳80</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="drinks">
+        <img src="https://images.unsplash.com/photo-1553787499-6f9133860278?w=300" alt="Fad Special Milk Shake" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Fad Special Milk Shake</h4>
+          <p>Loaded sweet ice cream shake</p>
+        </div>
+        <div class="menu-price">৳80</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="drinks">
+        <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300" alt="Lemon Mint Cooler" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Lemon Mint Cooler</h4>
+          <p>Fresh lime & garden crushed mint</p>
+        </div>
+        <div class="menu-price">৳40</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="drinks">
+        <img src="https://images.unsplash.com/photo-1613478223719-2ab802602423?w=300" alt="Fad Special Fresh Juice" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Fad Special Fresh Juice</h4>
+          <p>Seasonal fruits freshly extracted</p>
+        </div>
+        <div class="menu-price">৳50</div>
+      </div>
+
+      <!-- Snacks -->
+      <div class="menu-item tilt-card" data-category="snacks">
+        <img src="https://images.unsplash.com/photo-1626074353765-517a681e40be?w=300" alt="Crispy Pora Ruti" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Crispy Pora Ruti</h4>
+          <p>Clay-baked traditional bread</p>
+        </div>
+        <div class="menu-price">৳25</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="snacks">
+        <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300" alt="Chai + Pora Ruti Combo" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Chai + Pora Ruti Combo</h4>
+          <p>The ultimate evening snack pair</p>
+        </div>
+        <div class="menu-price">৳50</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="snacks">
+        <img src="https://images.unsplash.com/photo-1714298927557-f6467ff377af?w=300" alt="Regular Fuchka" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Regular Fuchka</h4>
+          <p>Crispy shells with spicy filling</p>
+        </div>
+        <div class="menu-price">৳50</div>
+      </div>
+
+      <div class="menu-item tilt-card" data-category="snacks">
+        <img src="https://images.unsplash.com/photo-1714799263291-272975db795a?w=300" alt="Fad Special Fuchka" class="item-thumb" loading="lazy">
+        <div class="menu-item-info">
+          <h4>Fad Special Fuchka</h4>
+          <p>Signature spiced water & loaded bowl</p>
+        </div>
+        <div class="menu-price">৳80</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Signature Callout -->
+  <div class="signature-banner">
+    <div class="tag-badge" style="background: rgba(212,175,122,0.18);">The Standard</div>
+    <h2>Your Daily Cup, Made Extraordinary.</h2>
+    <p>Whether you're starting your morning with an espresso or winding down your evening over a hot cup of Malai Chai with friends, FAD is your sanctuary.</p>
+    <a href="https://wa.me/8801700000000?text=I%20would%20like%20to%20reserve%20a%20table%20at%20FAD%20Cafe" target="_blank" class="btn-gold">Reserve / Order Via WhatsApp</a>
+  </div>
+
+  <!-- Gallery -->
+  <section id="gallery">
+    <div class="section-head">
+      <span>Atmosphere</span>
+      <h2>Moments Caught at FAD</h2>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item span-2">
+        <img src="https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=1000" alt="Artisan coffee latte art" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1498804103079-a6351b050096?w=600" alt="Barista preparing coffee" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600" alt="Fresh bakery snacks" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1511920170033-f8396924c348?w=600" alt="Cozy cafe table atmosphere" loading="lazy">
+      </div>
+      <div class="gallery-item span-2">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1000" alt="Modern warm cafe dining area" loading="lazy">
+      </div>
+      <div class="gallery-item">
+        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600" alt="Breads and bakery items" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- Visit / Contact -->
+  <section class="visit-section" id="visit">
+    <div class="section-head">
+      <span>Get In Touch</span>
+      <h2>Come Say Hello</h2>
+    </div>
+
+    <div class="visit-card-wrap">
+      <div class="visit-card">
+        <div class="icon">📍</div>
+        <h3>Our Location</h3>
+        <p>Signboard, Dhaka<br>Bangladesh</p>
+        <a href="https://www.google.com/maps/search/?api=1&query=Signboard+Dhaka+Bangladesh" target="_blank" class="nav-btn" style="display:inline-block; margin-top:16px;">Open Google Maps</a>
+      </div>
+
+      <div class="visit-card">
+        <div class="icon">🕒</div>
+        <h3>Opening Hours</h3>
+        <p>Saturday – Thursday: 9:00 AM – 11:30 PM<br>Friday: 2:00 PM – 11:30 PM</p>
+        <span style="display:inline-block; margin-top:16px; font-size:12px; color:var(--gold); letter-spacing:1px; text-transform:uppercase;">● Open Today</span>
+      </div>
+
+      <div class="visit-card">
+        <div class="icon">💬</div>
+        <h3>Direct Contact</h3>
+        <p>Need takeaway or book a celebration table?</p>
+        <a href="https://wa.me/8801700000000" target="_blank" class="btn-gold" style="display:inline-block; margin-top:16px; padding:10px 22px; font-size:11px;">Chat on WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-logo">FAD CAFE</div>
+    <p class="footer-text">A Little Pause. A Lot of Comfort.</p>
+    <div class="footer-links">
+      <a href="#home">Home</a>
+      <a href="#about">Story</a>
+      <a href="#menu">Menu</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#visit">Contact</a>
+    </div>
+    <p class="copyright">© 2026 FAD CAFE. All Rights Reserved. Designed with WebGL 3D.</p>
+  </footer>
+
+  <!-- WhatsApp Floating Action -->
+  <a href="https://wa.me/8801700000000?text=Hi%20FAD%20Cafe,%20I%20want%20to%20order" class="whatsapp-float" target="_blank" aria-label="Order on WhatsApp">
+    💬
+  </a>
+
+  <!-- ================= THREE.JS 3D ENGINE & SCRIPTS ================= -->
+  <script>
+    /* --- 1. Three.js 3D Interactive Scene --- */
+    const container = document.getElementById('canvas3d-container');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.8, 6.2);
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    container.appendChild(renderer.domElement);
+
+    // 3D Coffee Cup Group
+    const cupGroup = new THREE.Group();
+
+    // Ceramic Matte Material
+    const ceramicMat = new THREE.MeshStandardMaterial({
+      color: 0x14110e,
+      roughness: 0.25,
+      metalness: 0.1,
+    });
+
+    // Gold Trim Ring Material
+    const goldMat = new THREE.MeshStandardMaterial({
+      color: 0xd4af7a,
+      roughness: 0.3,
+      metalness: 0.85,
+    });
+
+    // Coffee Liquid Material
+    const coffeeMat = new THREE.MeshStandardMaterial({
+      color: 0x3d2314,
+      roughness: 0.1,
+      metalness: 0.05,
+    });
+
+    // Cup Body
+    const cupGeo = new THREE.CylinderGeometry(1.18, 0.82, 1.9, 40);
+    const cupMesh = new THREE.Mesh(cupGeo, ceramicMat);
+    cupMesh.position.y = 0.95;
+    cupGroup.add(cupMesh);
+
+    // Gold Top Rim
+    const rimGeo = new THREE.TorusGeometry(1.18, 0.04, 16, 40);
+    rimGeo.rotateX(Math.PI / 2);
+    const rimMesh = new THREE.Mesh(rimGeo, goldMat);
+    rimMesh.position.y = 1.9;
+    cupGroup.add(rimMesh);
+
+    // Coffee surface
+    const coffeeGeo = new THREE.CircleGeometry(1.1, 32);
+    coffeeGeo.rotateX(-Math.PI / 2);
+    const coffeeMesh = new THREE.Mesh(coffeeGeo, coffeeMat);
+    coffeeMesh.position.y = 1.82;
+    cupGroup.add(coffeeMesh);
+
+    // Cup Handle
+    const handleGeo = new THREE.TorusGeometry(0.55, 0.11, 16, 32, Math.PI * 1.15);
+    const handleMesh = new THREE.Mesh(handleGeo, ceramicMat);
+    handleMesh.rotation.z = -Math.PI / 2;
+    handleMesh.position.set(1.15, 0.95, 0);
+    cupGroup.add(handleMesh);
+
+    // Saucer Base
+    const saucerGeo = new THREE.CylinderGeometry(1.8, 1.2, 0.12, 40);
+    const saucerMesh = new THREE.Mesh(saucerGeo, ceramicMat);
+    saucerMesh.position.y = -0.05;
+    cupGroup.add(saucerMesh);
+
+    const saucerRimGeo = new THREE.TorusGeometry(1.8, 0.03, 16, 40);
+    saucerRimGeo.rotateX(Math.PI / 2);
+    const saucerRimMesh = new THREE.Mesh(saucerRimGeo, goldMat);
+    saucerRimMesh.position.y = 0.01;
+    cupGroup.add(saucerRimMesh);
+
+    // 3D Steam Particles
+    const steamCount = 35;
+    const steamGeo = new THREE.SphereGeometry(0.06, 8, 8);
+    const steamMat = new THREE.MeshBasicMaterial({
+      color: 0xedd3a4,
+      transparent: true,
+      opacity: 0.35
+    });
+
+    const steamParticles = [];
+    for (let i = 0; i < steamCount; i++) {
+      const p = new THREE.Mesh(steamGeo, steamMat.clone());
+      p.position.set(
+        (Math.random() - 0.5) * 0.8,
+        1.9 + Math.random() * 2,
+        (Math.random() - 0.5) * 0.8
+      );
+      p.scale.setScalar(Math.random() * 1.5 + 0.8);
+      cupGroup.add(p);
+      steamParticles.push({
+        mesh: p,
+        speedY: 0.015 + Math.random() * 0.015,
+        fadeSpeed: 0.006 + Math.random() * 0.006,
+        initY: 1.85,
+        drift: (Math.random() - 0.5) * 0.008
+      });
+    }
+
+    // Floating 3D Coffee Beans
+    const beanMat = new THREE.MeshStandardMaterial({
+      color: 0x54331d,
+      roughness: 0.4,
+      metalness: 0.1
+    });
+
+    const floatingBeans = [];
+    for (let b = 0; b < 7; b++) {
+      const beanGeo = new THREE.SphereGeometry(0.2, 12, 12);
+      beanGeo.scale(1, 0.65, 0.5);
+      const bean = new THREE.Mesh(beanGeo, beanMat);
+      
+      const angle = (b / 7) * Math.PI * 2;
+      const radius = 2.4 + Math.random() * 0.8;
+      bean.position.set(
+        Math.cos(angle) * radius,
+        (Math.random() - 0.5) * 2 + 1,
+        Math.sin(angle) * radius
+      );
+      bean.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      scene.add(bean);
+      floatingBeans.push({
+        mesh: bean,
+        orbitRadius: radius,
+        speed: 0.008 + Math.random() * 0.007,
+        angle: angle,
+        rotSpeed: 0.02
+      });
+    }
+
+    cupGroup.position.set(0, -0.6, 0);
+    scene.add(cupGroup);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    scene.add(ambientLight);
+
+    const warmLight = new THREE.PointLight(0xd4af7a, 2.8, 15);
+    warmLight.position.set(3, 4, 4);
+    scene.add(warmLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    rimLight.position.set(-4, 3, -2);
+    scene.add(rimLight);
+
+    // Interactive Drag & Mouse Follow
+    let isDragging = false;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let targetRotationY = 0.5;
+    let targetRotationX = 0.2;
+
+    container.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    window.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      const inHero = e.clientY >= rect.top && e.clientY <= rect.bottom;
+      
+      if (isDragging) {
+        const deltaX = e.clientX - prevMouseX;
+        const deltaY = e.clientY - prevMouseY;
+        targetRotationY += deltaX * 0.008;
+        targetRotationX += deltaY * 0.005;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      } else if (inHero) {
+        const normX = (e.clientX / window.innerWidth) - 0.5;
+        const normY = (e.clientY / window.innerHeight) - 0.5;
+        targetRotationY = normX * 1.2;
+        targetRotationX = normY * 0.6 + 0.15;
+      }
+    });
+
+    // Touch Support for Mobile
+    container.addEventListener('touchstart', (e) => {
+      isDragging = true;
+      prevMouseX = e.touches[0].clientX;
+      prevMouseY = e.touches[0].clientY;
+    }, { passive: true });
+
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    container.addEventListener('touchmove', (e) => {
+      if (isDragging) {
+        const deltaX = e.touches[0].clientX - prevMouseX;
+        const deltaY = e.touches[0].clientY - prevMouseY;
+        targetRotationY += deltaX * 0.01;
+        targetRotationX += deltaY * 0.008;
+        prevMouseX = e.touches[0].clientX;
+        prevMouseY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    // Animation Loop (60 FPS)
+    function animate() {
+      requestAnimationFrame(animate);
+
+      // Smooth Lerp Rotation
+      cupGroup.rotation.y += (targetRotationY - cupGroup.rotation.y) * 0.06;
+      cupGroup.rotation.x += (targetRotationX - cupGroup.rotation.x) * 0.06;
+
+      if (!isDragging) {
+        targetRotationY += 0.0025; // Gentle continuous orbit
+      }
+
+      // Animate Steam
+      steamParticles.forEach(p => {
+        p.mesh.position.y += p.speedY;
+        p.mesh.position.x += p.drift;
+        p.mesh.material.opacity -= p.fadeSpeed;
+        p.mesh.scale.multiplyScalar(1.008);
+
+        if (p.mesh.material.opacity <= 0 || p.mesh.position.y > 3.8) {
+          p.mesh.position.set(
+            (Math.random() - 0.5) * 0.7,
+            p.initY,
+            (Math.random() - 0.5) * 0.7
+          );
+          p.mesh.material.opacity = 0.35;
+          p.mesh.scale.setScalar(Math.random() * 1.5 + 0.8);
+        }
+      });
+
+      // Animate Floating Beans
+      floatingBeans.forEach(b => {
+        b.angle += b.speed;
+        b.mesh.position.x = Math.cos(b.angle) * b.orbitRadius;
+        b.mesh.position.z = Math.sin(b.angle) * b.orbitRadius;
+        b.mesh.rotation.x += b.rotSpeed;
+        b.mesh.rotation.y += b.rotSpeed * 0.7;
+      });
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    // Window Resize Event
+    window.addEventListener('resize', () => {
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+
+    /* --- 2. 3D Card Hover Perspective Tilt Effect --- */
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        const rotateX = ((y - centerY) / centerY) * -12;
+        const rotateY = ((x - centerX) / centerX) * 12;
+
+        card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+      });
+    });
+
+    /* --- 3. Mobile Navigation Toggle --- */
+    const toggle = document.getElementById('menuToggle');
+    const nav = document.getElementById('navMenu');
+    toggle.addEventListener('click', () => {
+      nav.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => nav.classList.remove('open'));
+    });
+
+    /* --- 4. Menu Category Filter --- */
+    function filterMenu(category) {
+      const buttons = document.querySelectorAll('.filter-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const items = document.querySelectorAll('.menu-item');
+      items.forEach(item => {
+        if (category === 'all' || item.getAttribute('data-category') === category) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
